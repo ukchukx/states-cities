@@ -17,7 +17,7 @@ class State(Object):
 
 
     @classmethod
-    def find_by_name_or_code(cls,state_name_or_code):
+    def find_by_name_or_code(cls, state_name_or_code):
         try:
             if len(state_name_or_code) == 2:
                 state = State.Query.get(state_code=state_name_or_code.upper())
@@ -25,11 +25,14 @@ class State(Object):
                 state = State.Query.get(name=state_name_or_code.title())
             return state
         except QueryResourceDoesNotExist, e:
-            raise InvalidAPIUsage("State with state name or code '{}' does not exist".format(state_name_or_code), status_code=404)
+            raise InvalidAPIUsage(
+                "State with state name or code '{}' does not exist".format(state_name_or_code),
+                 status_code=404
+            )
 
     @staticmethod
     def get_all_states():
-        return [ state.as_dict() for state in State.Query.all() ]
+        return list(map(lambda state: state.as_dict(), State.Query.all()))
 
     @staticmethod
     def get_one_state(state_name_or_code):
@@ -43,24 +46,37 @@ class LGA(Object):
         }
 
     @classmethod
-    def find_state_cities(cls,state_name_or_code):
+    def find_state_cities(cls, state_name_or_code):
         _state_ = State.find_by_name_or_code(state_name_or_code)
-        return [ lga.as_dict() for lga in LGA.Query.filter( state=_state_, city=True ) ]
+        return list(
+            map(
+                lambda lga: lga.as_dict(), 
+                LGA.Query.filter( state=_state_, city=True )
+            )
+        )
 
     @staticmethod
     def get_all_lgas_with_state_name(state_name):
-        result_set = []
         state_result = State.Query.get(name=state_name)
         print state_result.objectId
-        lgas = LGA.Query.filter(state=state_result)
-        for lga in lgas:
-            result_set.append(lga.as_dict())
-        return result_set
+        return list(
+            map(
+                lambda lga: lga.as_dict(), 
+                LGA.Query.filter(state=state_result)
+            )
+        )
 
     @staticmethod
     def get_all_lgas(state_name_or_code):
         _state_ = State.find_by_name_or_code(state_name_or_code)
         return [ lga.as_dict() for lga in LGA.Query.filter(state=_state_) ]
+        return list(
+            map(
+                lambda lga: lga.as_dict(), 
+                LGA.Query.filter(state=_state_)
+            )
+        )
+
 
     @staticmethod
     def get_all_cities(state_name_or_code):
