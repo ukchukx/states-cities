@@ -32,7 +32,7 @@ class State(Object):
 
     @staticmethod
     def get_all_states():
-        return list(map(lambda state: state.as_dict(), State.Query.all()))
+        return [state.as_dict() for state in State.Query.all()]
 
     @staticmethod
     def get_one_state(state_name_or_code):
@@ -48,34 +48,18 @@ class LGA(Object):
     @classmethod
     def find_state_cities(cls, state_name_or_code):
         _state_ = State.find_by_name_or_code(state_name_or_code)
-        return list(
-            map(
-                lambda lga: lga.as_dict(), 
-                LGA.Query.filter( state=_state_, city=True )
-            )
-        )
+        return [lga.as_dict() for lga in LGA.Query.filter( state=_state_, city=True )]
 
     @staticmethod
     def get_all_lgas_with_state_name(state_name):
         state_result = State.Query.get(name=state_name)
         print state_result.objectId
-        return list(
-            map(
-                lambda lga: lga.as_dict(), 
-                LGA.Query.filter(state=state_result)
-            )
-        )
+        return list(map(lambda lga: lga.as_dict(), LGA.Query.filter(state=state_result)))
 
     @staticmethod
     def get_all_lgas(state_name_or_code):
         _state_ = State.find_by_name_or_code(state_name_or_code)
-        return [ lga.as_dict() for lga in LGA.Query.filter(state=_state_) ]
-        return list(
-            map(
-                lambda lga: lga.as_dict(), 
-                LGA.Query.filter(state=_state_)
-            )
-        )
+        return [lga.as_dict() for lga in LGA.Query.filter(state=_state_)]
 
 
     @staticmethod
